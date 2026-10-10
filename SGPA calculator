@@ -16,21 +16,36 @@ grade_points = {
     "P":4,
     "F":0
 }
+results = []
 for i in range(subjects):
     print("\nSubject",i+1)
     subject_name = input("Enter subject name:")
     credits = float(input("Enter credits:"))
-    grade = input("Enter grade:").upper()
-    grade_point = grade_points[grade]
-    credit_points = credits * grade_point
+    while True:
+    grade = input("Enter grade: ").upper()
 
+    if grade in grade_points:
+        grade_point = grade_points[grade]
+        break
+    else:
+        print("Invalid grade! Please enter O, A+, A, B+, B, C, P or F.")
+    credit_points = credits * grade_point
+    results.append((subject_name, credits, grade, grade_point, credit_points))  
     total_credits += credits
     total_points += credit_points
+print("\n==============================================")
+print("                 RESULTS"                        )
+print("==============================================")
+
+print(f"{'Subject':<20}{'Credits':<10}{'Grade':<8}{'Points':<10}")
+print("-" * 48)
+
+for subject, credits, grade, grade_point, credit_points in results:
+    print(f"{subject:<20}{credits:<10}{grade:<8}{credit_points:<10}")
 sgpa = total_points / total_credits
 
-print("\n==============================")
 print("Total Credits:", total_credits)
 print("SGPA:", round(sgpa, 2))
-print("==============================")
+
 
     
