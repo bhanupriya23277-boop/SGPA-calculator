@@ -56,18 +56,47 @@ grade_points = {
 
 # Add Subject function
 def add_subject():
-    subject = subject_entry.get()
-    credits = float(credits_entry.get())
+    subject = subject_entry.get().strip()
     grade = grade_combo.get()
 
+    # Check subject name
+    if not subject:
+        result_label.config(text="Please enter subject name!")
+        return
+
+    # Check credits
+    try:
+        credits = float(credits_entry.get())
+
+        if credits <= 0:
+            result_label.config(text="Credits must be positive!")
+            return
+
+    except ValueError:
+        result_label.config(text="Please enter valid credits!")
+        return
+
+    # Check grade
+    if grade not in grade_points:
+        result_label.config(text="Please select a grade!")
+        return
+
+    # Store subject information
     subjects.append((subject, credits, grade))
 
-table.insert(
-    "",
-    "end",
-    values=(subject, credits, grade)
-)
-    
+    # Display subject in table
+    table.insert(
+        "",
+        "end",
+        values=(subject, credits, grade)
+    )
+
+    # Clear input fields
+    subject_entry.delete(0, tk.END)
+    credits_entry.delete(0, tk.END)
+    grade_combo.set("Select Grade")
+
+    result_label.config(text="Subject added successfully!")   
 # Subject table
 table = ttk.Treeview(
     root,
@@ -100,9 +129,26 @@ def calculate_sgpa():
 
     if total_credits > 0:
         sgpa = total_points / total_credits
-        result_label.config(text=f"SGPA: {sgpa:.2f}")
     else:
         result_label.config(text="Please add subjects first.")
+    result_label.config(
+    text=f"Your SGPA: {sgpa:.2f}\nTotal Credits: {total_credits}"
+)
+# Reset function
+def reset_calculator():
+    subjects.clear()
+
+    # Clear the table
+    for item in table.get_children():
+        table.delete(item)
+
+    # Clear input fields
+    subject_entry.delete(0, tk.END)
+    credits_entry.delete(0, tk.END)
+    grade_combo.set("Select Grade")
+
+    # Reset SGPA result
+    result_label.config(text="SGPA: --")
 calculate_button = tk.Button(
     root,
     text="Calculate SGPA",
@@ -110,13 +156,23 @@ calculate_button = tk.Button(
 )
 
 calculate_button.pack(pady=10)
+reset_button = tk.Button(
+    root,
+    text="Reset",
+    command=reset_calculator
+)
+
+reset_button.pack(pady=5)
 # THIS IS WHERE THE ANSWER/RESULT IS DISPLAYED
 result_label = tk.Label(
     root,
-    text="SGPA: --",
-    font=("Arial", 18, "bold")
+    text="Your SGPA: --",
+    font=("Arial", 18, "bold"),
+    fg="green",
+    justify="center"
 )
-result_label.pack(pady=10)
+
+result_label.pack(pady=15)
 
 # Run the application
 root.mainloop()
