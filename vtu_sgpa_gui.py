@@ -1,20 +1,49 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox, filedialog
 
 # Create the main window
 root = tk.Tk()
-
 root.title("VTU SGPA Calculator")
-root.geometry("700x500")
+root.geometry("750x650")
+root.configure(bg="#F0F4F8")
+root.resizable(True, True)
 
 # Heading
 title = tk.Label(
     root,
     text="VTU SGPA CALCULATOR",
-    font=("Arial", 22, "bold")
+    font=("Arial", 22, "bold"),
+    bg="#F0F4F8",
+    fg="#17365D"
 )
 
 title.pack(pady=20)
+
+# Semester selection
+semester_label = tk.Label(
+    root,
+    text="Select Semester:",
+    font=("Arial", 12)
+)
+semester_label.pack(pady=5)
+semester_combo = ttk.Combobox(
+    root,
+    values=[
+        "1st Semester",
+        "2nd Semester",
+        "3rd Semester",
+        "4th Semester",
+        "5th Semester",
+        "6th Semester",
+        "7th Semester",
+        "8th Semester"
+    ],
+    state="readonly",
+    width=27
+)
+semester_combo.pack(pady=5)
+semester_combo.set("Select Semester")
 
 # Subject Name
 subject_label = tk.Label(root, text="Subject Name:")
@@ -22,12 +51,13 @@ subject_label.pack()
 
 subject_entry = tk.Entry(root, width=30)
 subject_entry.pack(pady=5)
+
 # Credits
 credits_label = tk.Label(root, text="Credits:")
 credits_label.pack()
-
 credits_entry = tk.Entry(root, width=30)
 credits_entry.pack(pady=5)
+
 # Grade
 grade_label = tk.Label(root, text="Grade:")
 grade_label.pack()
@@ -41,6 +71,7 @@ grade_combo = ttk.Combobox(
 
 grade_combo.pack(pady=5)
 grade_combo.set("Select Grade")
+
 # Store subjects
 subjects = []
 grade_points = {
@@ -113,7 +144,12 @@ table.pack(pady=10)
 add_button = tk.Button(
     root,
     text="Add Subject",
-    command=add_subject
+    command=add_subject,
+    bg="#2563EB",
+    fg="white",
+    font=("Arial", 11, "bold"),
+    width=18,
+    cursor="hand2"
 )
 
 add_button.pack(pady=10)
@@ -152,9 +188,62 @@ def reset_calculator():
 calculate_button = tk.Button(
     root,
     text="Calculate SGPA",
-    command=calculate_sgpa
+    command=calculate_sgpa,
+    bg="#15803D",
+    fg="white",
+    font=("Arial", 11, "bold"),
+    width=18,
+    cursor="hand2"
 )
 
+# Export results to a text file
+def export_results():
+    if not subjects:
+        messagebox.showwarning(
+            "No Subjects",
+            "Please add subjects before exporting."
+        )
+        return
+
+    filename = filedialog.asksaveasfilename(
+        defaultextension=".txt",
+        filetypes=[("Text Files", "*.txt")],
+        title="Save SGPA Results"
+    )
+
+    if not filename:
+        return
+
+    total_credits = sum(item[1] for item in subjects)
+
+    total_points = sum(
+        credits * grade_points[grade]
+        for subject, credits, grade in subjects
+    )
+
+    sgpa = total_points / total_credits
+
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write("VTU SGPA CALCULATOR\n")
+        file.write("===================\n\n")
+
+        file.write(f"Semester: {semester_combo.get()}\n\n")
+
+        file.write("Subject Results:\n")
+        file.write("-------------------\n")
+
+        for subject, credits, grade in subjects:
+            file.write(
+                f"{subject} | Credits: {credits} | Grade: {grade}\n"
+            )
+
+        file.write(f"\nTotal Credits: {total_credits}\n")
+        file.write(f"SGPA: {sgpa:.2f}\n")
+
+    messagebox.showinfo(
+        "Success",
+        "Your SGPA results have been saved successfully!"
+    )
 calculate_button.pack(pady=10)
 reset_button = tk.Button(
     root,
@@ -163,6 +252,13 @@ reset_button = tk.Button(
 )
 
 reset_button.pack(pady=5)
+
+export_button = tk.Button(
+    root,
+    text="Export Results",
+    command=export_results
+)
+export_button.pack(pady=5)
 # THIS IS WHERE THE ANSWER/RESULT IS DISPLAYED
 result_label = tk.Label(
     root,
