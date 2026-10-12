@@ -261,13 +261,12 @@ export_button = tk.Button(
 export_button.pack(pady=5)
 # THIS IS WHERE THE ANSWER/RESULT IS DISPLAYED
 result_label = tk.Label(
+    result_label = tk.Label(
     root,
     text="Your SGPA: --",
-    font=("Arial", 18, "bold"),
     fg="green",
     justify="center"
 )
-
 result_label.pack(pady=15)
 
 # Run the application
